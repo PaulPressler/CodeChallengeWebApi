@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+
 
 namespace CodeChallengeAPI
 {
@@ -26,9 +28,15 @@ namespace CodeChallengeAPI
                 {
                     throw new ArgumentException("Start_Date must precede End_Date.");
                 }
-                if (quoteRequest.Start_Date < DateTime.Now || quoteRequest.End_Date < DateTime.Now)
+                if (quoteRequest.Start_Date < DateTime.Now.AddDays(-1) || quoteRequest.End_Date < DateTime.Now.AddDays(-1))
                 {
-                    throw new ArgumentException("Start_Date and End_Date must be future dates.");
+                    throw new ArgumentException("Start_Date and End_Date must be a current or future date.");
+                }
+
+                // Validate the currency_id is alpha only
+                if (!new Regex("^[a-zA-Z]*$").IsMatch(quoteRequest.Currency_Id))
+                {
+                    throw new ArgumentException("Currency_Id must only contain alpha characters, A-Z.");
                 }
 
                 QuoteResponse quoteResponse = new QuoteResponse() { Total = 0, Currency_Id = quoteRequest.Currency_Id, Quotation_Id = Guid.NewGuid()};
